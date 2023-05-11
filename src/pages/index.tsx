@@ -50,20 +50,46 @@ type TEntry = {
 }
 
 type TEntryBoolean = {
-  isVisible: boolean
+  isVisible: boolean,
+  nestedValues: string[]
 }
 
 type TEntryUI = TEntry & TEntryBoolean;
-const EntryComp = ({name, children, isVisible}:any) => {
+const EntryComp = ({name, children, isVisible, nestedValues}:any) => {
+  const currNested: string[] = nestedValues.concat(name);
   const [showChildren, setChildren] = useState(false);
+  const [newInput, setInput] = useState('');
+  const AddComponent = () => {
+    let prop: any = files.children;
+    let temp: any;
+    for(const child of currNested){
+      let val = prop.length != undefined? prop.length : 0 
+      console.log(child);
+      for(let i = 0; i < val; i++){
+        if(child == prop[i].name){
+          temp = prop[i];
+          break;
+        }
+      }
+      console.log(prop);
+      prop = temp;
+    };
+    prop.children.push({
+      name: newInput,
+    });
+    
+  }
   return (
     <>
       <button style={{fontFamily:'monospace', margin:'1rem',color:'white', backgroundColor:'blue', borderRadius:'12px', fontSize:'24px'}} onClick={() => setChildren(!showChildren)}>{name}{showChildren == false ? '+': '-'}</button>
+      <ul>
+          <input value = {newInput} onChange={(e) => setInput(e.target.value)} placeholder='Add New Value'/><button onClick={AddComponent}>Add</button>
+      </ul>
       {children?.length && showChildren == true && (
         <div>
           {children.map((child:any) => (
             <ul key={child.name}>
-              <EntryComp name={child.name} children = {child.children} isVisible= {isVisible} />
+              <EntryComp name={child.name} children = {child.children} isVisible= {isVisible} nestedValues={currNested}/>
             </ul>
           ))}
         </div>
@@ -78,7 +104,7 @@ export default function Home() {
         {
           files.children.map((data) => (
             <div style={{paddingBottom:'2rem'}}>
-            <EntryComp name={data.name} children= {data.children} isVisible={true}/>
+            <EntryComp name={data.name} children= {data.children} isVisible={true} nestedValues={[]}/>
             </div>
           ))
         }
